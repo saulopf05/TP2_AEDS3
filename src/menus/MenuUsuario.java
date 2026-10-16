@@ -53,7 +53,7 @@ public class MenuUsuario {
                     break;
 
                 case 'B':
-                    buscarPerguntas();
+                    menuBuscarPerguntas();
                     break;
 
                 case 'S':
@@ -67,7 +67,49 @@ public class MenuUsuario {
         } while (opcao != 'S');
     }
 
-    private void buscarPerguntas() {
+    private void menuBuscarPerguntas() {
+        char opcao;
+
+        do {
+            System.out.println("\n\nAJUDA AÍ 1.0");
+            System.out.println("------------");
+            System.out.println("> Início > Buscar perguntas");
+
+            System.out.println("\n(A) Perguntas mais recentes");
+            System.out.println("(B) Busca por palavras-chave");
+            System.out.println("\n(R) Retornar");
+
+            System.out.print("\nOpção: ");
+
+            try {
+                opcao = console.nextLine().toUpperCase().charAt(0);
+            } catch (Exception e) {
+                opcao = ' ';
+            }
+
+            switch (opcao) {
+                case 'A':
+                    listarPerguntasRecentes();
+                    break;
+
+                case 'B':
+                    System.out.println(
+                        "\nA busca por palavras-chave ainda não foi implementada."
+                    );
+                    break;
+
+                case 'R':
+                    break;
+
+                default:
+                    System.out.println("\nOpção inválida!");
+                    break;
+            }
+
+        } while (opcao != 'R');
+    }
+
+    private void listarPerguntasRecentes() {
         try {
             ArquivoPergunta arqPerguntas = new ArquivoPergunta();
             ArquivoUsuario arqUsuarios = new ArquivoUsuario();
