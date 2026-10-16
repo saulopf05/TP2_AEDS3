@@ -16,30 +16,25 @@ public class Resposta implements Registro {
     public long criacao;
     public String texto;
     public short nota;
+    public short avaliacoes;
     public boolean ativa;
 
     public Resposta() {
-        this(-1, -1, -1, 0, "", (short) 0, true);
+        this(-1, -1, -1, 0, "", (short) 0, (short) 0, true);
     }
 
     public Resposta(int idPergunta, int idUsuario, String texto) {
-        this(-1,
-                idPergunta,
-                idUsuario,
-                System.currentTimeMillis(),
-                texto,
-                (short) 0,
-                true);
+        this(-1, idPergunta, idUsuario, System.currentTimeMillis(), texto, (short) 0, (short) 0, true);
     }
 
-    public Resposta(int idResposta, int idPergunta, int idUsuario,
-            long criacao, String texto, short nota, boolean ativa) {
+    public Resposta(int idResposta, int idPergunta, int idUsuario, long criacao, String texto, short nota, short avaliacoes, boolean ativa) {
         this.idResposta = idResposta;
         this.idPergunta = idPergunta;
         this.idUsuario = idUsuario;
         this.criacao = criacao;
         this.texto = texto;
         this.nota = nota;
+        this.avaliacoes = avaliacoes;
         this.ativa = ativa;
     }
 
@@ -72,6 +67,7 @@ public class Resposta implements Registro {
         dos.writeLong(this.criacao);
         dos.writeUTF(this.texto);
         dos.writeShort(this.nota);
+        dos.writeShort(this.avaliacoes);
         dos.writeBoolean(this.ativa);
 
         return baos.toByteArray();
@@ -88,13 +84,14 @@ public class Resposta implements Registro {
         this.criacao = dis.readLong();
         this.texto = dis.readUTF();
         this.nota = dis.readShort();
+        this.avaliacoes = dis.readShort();
         this.ativa = dis.readBoolean();
     }
 
     @Override
     public String toString() {
         return "\nResposta: " + this.texto +
-                "\nNota: " + this.nota +
+                "\nNota: " + this.nota + " (" + this.avaliacoes + " avaliações)" +
                 (this.ativa ? "" : "\nINATIVA");
     }
 }

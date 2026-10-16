@@ -59,6 +59,10 @@ public class ParPerguntaResposta implements aed3.InterfaceArvoreBMais<ParPergunt
         if (this.idPergunta != outro.idPergunta) {
             return Integer.compare(this.idPergunta, outro.idPergunta);
         }
+        
+        if (this.idResposta == -1 || outro.idResposta == -1) {
+            return 0;
+        }
 
         return Integer.compare(this.idResposta, outro.idResposta);
     }

@@ -12,32 +12,22 @@ public class Voto implements Registro {
 
     public int idVoto;
     public int idUsuario;
-    public int idPergunta;
     public int idResposta;
-    public short valor;
-    public long criacao;
+    public boolean avaliacao;
 
     public Voto() {
-        this(-1, -1, -1, -1, (short) 0, 0L);
+        this(-1, -1, -1, true);
     }
 
-    public Voto(int idUsuario, int idPergunta, int idResposta, short valor) {
-        this(-1,
-                idUsuario,
-                idPergunta,
-                idResposta,
-                valor,
-                System.currentTimeMillis());
+    public Voto(int idUsuario, int idResposta, boolean avaliacao) {
+        this(-1, idUsuario, idResposta, avaliacao);
     }
 
-    public Voto(int idVoto, int idUsuario, int idPergunta,
-            int idResposta, short valor, long criacao) {
+    public Voto(int idVoto, int idUsuario, int idResposta, boolean avaliacao) {
         this.idVoto = idVoto;
         this.idUsuario = idUsuario;
-        this.idPergunta = idPergunta;
         this.idResposta = idResposta;
-        this.valor = valor;
-        this.criacao = criacao;
+        this.avaliacao = avaliacao;
     }
 
     @Override
@@ -54,10 +44,6 @@ public class Voto implements Registro {
         return this.idUsuario;
     }
 
-    public int getIdPergunta() {
-        return this.idPergunta;
-    }
-
     public int getIdResposta() {
         return this.idResposta;
     }
@@ -69,10 +55,8 @@ public class Voto implements Registro {
 
         dos.writeInt(this.idVoto);
         dos.writeInt(this.idUsuario);
-        dos.writeInt(this.idPergunta);
         dos.writeInt(this.idResposta);
-        dos.writeShort(this.valor);
-        dos.writeLong(this.criacao);
+        dos.writeBoolean(this.avaliacao);
 
         return baos.toByteArray();
     }
@@ -84,16 +68,14 @@ public class Voto implements Registro {
 
         this.idVoto = dis.readInt();
         this.idUsuario = dis.readInt();
-        this.idPergunta = dis.readInt();
         this.idResposta = dis.readInt();
-        this.valor = dis.readShort();
-        this.criacao = dis.readLong();
+        this.avaliacao = dis.readBoolean();
     }
 
     @Override
     public String toString() {
-        return "\nVoto: " + this.valor +
-                "\nPergunta: " + this.idPergunta +
-                "\nResposta: " + this.idResposta;
+        return "\nVoto: " + (this.avaliacao ? "Positivo" : "Negativo") +
+                "\nResposta: " + this.idResposta +
+                "\nUsuário: " + this.idUsuario;
     }
 }

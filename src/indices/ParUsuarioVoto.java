@@ -59,6 +59,10 @@ public class ParUsuarioVoto implements aed3.InterfaceArvoreBMais<ParUsuarioVoto>
         if (this.idUsuario != outro.idUsuario) {
             return Integer.compare(this.idUsuario, outro.idUsuario);
         }
+        
+        if (this.idVoto == -1 || outro.idVoto == -1) {
+            return 0;
+        }
 
         return Integer.compare(this.idVoto, outro.idVoto);
     }
