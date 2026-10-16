@@ -69,61 +69,55 @@ public class MenuUsuario {
 
     private void buscarPerguntas() {
         try {
-            System.out.println("\nBuscar perguntas");
-            System.out.println("----------------");
-
             ArquivoPergunta arqPerguntas = new ArquivoPergunta();
             ArquivoUsuario arqUsuarios = new ArquivoUsuario();
-            mapPerguntas.clear();
+            int pagina = 0;
+            int escolha = -1;
+            boolean sair = false;
 
-            ArrayList<ParUsuarioPergunta> lista = arqPerguntas.getIndiceUsuarioPergunta().read(null);
-
-            if (lista == null || lista.isEmpty()) {
-                System.out.println("\nNenhuma pergunta ativa no fórum.");
-                return;
-            }
-
-            int numero = 1;
-
-            for (ParUsuarioPergunta par : lista) {
-                Pergunta p = arqPerguntas.read(par.getIdPergunta());
-
-                if (p != null && p.ativa) {
-                    Usuario autor = arqUsuarios.read(p.getIdUsuario());
-
-                    System.out.println("\n(" + numero + ")");
-                    System.out.println(Formato.dataHora(p.criacao));
-                    System.out.println(p.pergunta);
-                    System.out.println("Autor: " + (autor != null ? autor.nome : "Desconhecido"));
-                    System.out.println("Palavras-chave: " + p.palavrasChave);
-
-                    mapPerguntas.add(p.getId());
-                    numero++;
+            while (!sair && escolha == -1) {
+                mapPerguntas.clear();
+                ArrayList<Pergunta> recentes = new ArrayList<>(arqPerguntas.listarRecentes(pagina, 5));
+                System.out.println("\nPerguntas mais recentes — página " + (pagina + 1));
+                System.out.println("----------------------------------------");
+                if (recentes.isEmpty()) {
+                    if (pagina == 0) System.out.println("Nenhuma pergunta ativa no fórum.");
+                    else System.out.println("Não há mais perguntas nesta página.");
+                    System.out.println("P - Página anterior | R - Voltar");
+                } else {
+                    int numero = 1;
+                    for (Pergunta p : recentes) {
+                        Usuario autor = arqUsuarios.read(p.getIdUsuario());
+                        System.out.println("\n(" + numero + ") " + Formato.dataHora(p.criacao));
+                        System.out.println(p.pergunta);
+                        System.out.println("Autor: " + (autor != null ? autor.nome : "Desconhecido"));
+                        System.out.println("Palavras-chave: " + p.palavrasChave);
+                        mapPerguntas.add(p.getId());
+                        numero++;
+                    }
+                    System.out.println("\nN - Próxima página | P - Página anterior | R - Voltar");
+                }
+                System.out.print("Selecione o número da pergunta ou uma opção: ");
+                String entrada = console.nextLine().trim();
+                if (entrada.equalsIgnoreCase("R") || entrada.isEmpty()) {
+                    sair = true;
+                } else if (entrada.equalsIgnoreCase("N")) {
+                    if (recentes.size() == 5) pagina++;
+                    else System.out.println("Você já está na última página.");
+                } else if (entrada.equalsIgnoreCase("P")) {
+                    if (pagina > 0) pagina--;
+                    else System.out.println("Você já está na primeira página.");
+                } else {
+                    try {
+                        int n = Integer.parseInt(entrada);
+                        if (n >= 1 && n <= mapPerguntas.size()) escolha = n;
+                        else System.out.println("Número inválido.");
+                    } catch (NumberFormatException e) {
+                        System.out.println("Opção inválida.");
+                    }
                 }
             }
-
-            if (mapPerguntas.isEmpty()) {
-                System.out.println("\nNenhuma pergunta ativa no fórum.");
-                return;
-            }
-
-            System.out.print("\nDigite o número da pergunta para ver detalhes (0 para voltar): ");
-            String entrada = console.nextLine();
-
-            if (entrada.isEmpty()) {
-                return;
-            }
-
-            int escolha = Integer.parseInt(entrada);
-
-            if (escolha == 0) {
-                return;
-            }
-
-            if (escolha < 1 || escolha > mapPerguntas.size()) {
-                System.out.println("\nNúmero inválido.");
-                return;
-            }
+            if (sair || escolha == -1) return;
 
             int idPergunta = mapPerguntas.get(escolha - 1);
             Pergunta selecionada = arqPerguntas.read(idPergunta);

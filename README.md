@@ -1,4 +1,4 @@
-# AJUDA AÍ 1.0 — Trabalho Prático 1 de AEDs III
+# AJUDA AÍ 1.0 — Trabalho Prático 2 de AEDs III
 
 Sistema de perguntas e respostas em interface textual, construído sobre o CRUD
 genérico, a Tabela Hash Extensível e a Árvore B+ vistos em sala.

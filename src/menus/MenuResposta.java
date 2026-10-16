@@ -1,6 +1,8 @@
 package menus;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 
 import arquivos.ArquivoResposta;
@@ -74,40 +76,55 @@ public class MenuResposta {
 
     private void listar() {
         try {
-            System.out.println("\nRespostas");
-            System.out.println("--------");
-
-            ArrayList<ParPerguntaResposta> lista = arqRespostas.getIndicePerguntaResposta().read(null);
-
-            if (lista == null || lista.isEmpty()) {
-                System.out.println("\nAinda não há respostas para esta pergunta.");
-                return;
-            }
-
-            int numero = 1;
-
-            for (ParPerguntaResposta par : lista) {
-                if (par.getIdPergunta() == pergunta.getId()) {
-                    Resposta r = arqRespostas.read(par.getIdResposta());
-
-                    if (r != null && r.ativa) {
-                        Usuario autor = arqUsuarios.read(r.getIdUsuario());
-                        System.out.println("\n" + numero + " - " + r.texto);
-                        System.out.println("Autor: " + (autor != null ? autor.nome : "Desconhecido"));
-                        System.out.println("Nota: " + r.nota);
-                        numero++;
+            System.out.println("\nRespostas ordenadas pela nota (maior primeiro)");
+            System.out.println("---------------------------------------------");
+            ArrayList<ParPerguntaResposta> indice = arqRespostas.getIndicePerguntaResposta().read(null);
+            ArrayList<Resposta> respostas = new ArrayList<>();
+            if (indice != null) {
+                for (ParPerguntaResposta par : indice) {
+                    if (par.getIdPergunta() == pergunta.getId()) {
+                        Resposta r = arqRespostas.read(par.getIdResposta());
+                        if (r != null && r.ativa) respostas.add(r);
                     }
                 }
             }
-
-            if (numero == 1) {
+            Collections.sort(respostas, new Comparator<Resposta>() {
+                @Override public int compare(Resposta a, Resposta b) {
+                    int porNota = Short.compare(b.nota, a.nota);
+                    if (porNota != 0) return porNota;
+                    return Long.compare(b.criacao, a.criacao);
+                }
+            });
+            if (respostas.isEmpty()) {
                 System.out.println("\nAinda não há respostas para esta pergunta.");
+                return;
             }
-
+            int numero = 1;
+            for (Resposta r : respostas) {
+                Usuario autor = arqUsuarios.read(r.getIdUsuario());
+                System.out.println("\n" + numero + " - " + r.texto);
+                System.out.println("Autor: " + (autor != null ? autor.nome : "Desconhecido"));
+                System.out.println("Data: " + Formato.dataHora(r.criacao));
+                System.out.println("Nota: " + r.nota);
+                System.out.println("Quantidade de avaliações: " + contarAvaliacoes(r.getId()));
+                numero++;
+            }
         } catch (Exception e) {
             System.out.println("\nErro ao listar respostas!");
             e.printStackTrace();
         }
+    }
+
+    private int contarAvaliacoes(int idResposta) throws Exception {
+        ArrayList<ParUsuarioVoto> pares = arqVotos.getIndiceUsuarioVoto().read(null);
+        int total = 0;
+        if (pares != null) {
+            for (ParUsuarioVoto par : pares) {
+                Voto voto = arqVotos.read(par.getIdVoto());
+                if (voto != null && voto.getIdResposta() == idResposta) total++;
+            }
+        }
+        return total;
     }
 
     private void incluir() {
