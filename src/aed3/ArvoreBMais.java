@@ -427,10 +427,14 @@ public class ArvoreBMais<T extends InterfaceArvoreBMais<T>> {
                 auxElemento = np.elementos.get(0).clone();
 
             // caso contrário, promove o maior elemento da página esquerda
-            // removendo-o da página
+            // removendo-o da página. O filho à direita dele passa a ser o
+            // primeiro filho da nova página. (Correção do grupo: antes esse
+            // filho era descartado e, quando i == meio, o elemento promovido
+            // era o recém-inserido, cujo filho direito ficava fora da árvore,
+            // desordenando as folhas.)
             else {
                 auxElemento = pa.elementos.remove(pa.elementos.size() - 1);
-                pa.filhos.remove(pa.filhos.size() - 1);
+                np.filhos.set(0, pa.filhos.remove(pa.filhos.size() - 1));
             }
         }
 
@@ -635,16 +639,19 @@ public class ArvoreBMais<T extends InterfaceArvoreBMais<T>> {
             if (pIrmaoEsq != null && pIrmaoEsq.elementos.size() > maxElementos / 2) {
 
                 // Se for folha, copia o elemento do irmão, já que o do pai será extinto ou
-                // repetido
-                if (pFilho.filhos.get(0) == -1)
+                // repetido, e copia o elemento vindo do irmão para o pai (página atual)
+                if (pFilho.filhos.get(0) == -1) {
                     pFilho.elementos.add(0, pIrmaoEsq.elementos.remove(pIrmaoEsq.elementos.size() - 1));
+                    pa.elementos.set(diminuido - 1, pFilho.elementos.get(0));
+                }
 
-                // Se não for folha, desce o elemento do pai
-                else
+                // Se não for folha, desce o elemento do pai e sobe o maior elemento do
+                // irmão. (Correção do grupo: antes o pai recebia de volta o próprio
+                // elemento e o irmão perdia um ponteiro sem perder o elemento.)
+                else {
                     pFilho.elementos.add(0, pa.elementos.get(diminuido - 1));
-
-                // Copia o elemento vindo do irmão para o pai (página atual)
-                pa.elementos.set(diminuido - 1, pFilho.elementos.get(0));
+                    pa.elementos.set(diminuido - 1, pIrmaoEsq.elementos.remove(pIrmaoEsq.elementos.size() - 1));
+                }
 
                 // Reduz o elemento no irmão (copia o ponteiro também)
                 pFilho.filhos.add(0, pIrmaoEsq.filhos.remove(pIrmaoEsq.filhos.size() - 1));
