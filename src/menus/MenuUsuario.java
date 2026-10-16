@@ -13,7 +13,6 @@ import entidades.Usuario;
 import entidades.Voto;
 import indices.ParPerguntaResposta;
 import indices.ParUsuarioPergunta;
-import indices.ParUsuarioVoto;
 
 public class MenuUsuario {
     private static Scanner console = Console.entrada();
@@ -184,7 +183,6 @@ public class MenuUsuario {
             char opcaoDetalhe;
             do {
                 System.out.println("\nA - Ver respostas");
-                System.out.println("B - Votar nesta pergunta");
                 System.out.println("R - Retornar");
                 System.out.print("\nOpção: ");
 
@@ -203,10 +201,6 @@ public class MenuUsuario {
                             System.out.println("\nErro ao acessar o menu de respostas!");
                             e.printStackTrace();
                         }
-                        break;
-
-                    case 'B':
-                        votarPergunta(selecionada);
                         break;
 
                     case 'R':
@@ -233,7 +227,7 @@ public class MenuUsuario {
         System.out.println("A - Meus dados");
         System.out.println("B - Minhas perguntas");
         System.out.println("C - Minhas respostas");
-        System.out.println("D - Meus votos");
+        System.out.println("D - Minhas avaliações");
         System.out.println("R - Retornar");
         System.out.print("\nOpção: ");
 
@@ -265,7 +259,7 @@ public class MenuUsuario {
                 break;
 
             case 'D':
-                meusVotos();
+                minhasAvaliacoes();
                 break;
 
             case 'R':
@@ -285,147 +279,130 @@ public class MenuUsuario {
             ArquivoResposta arqRespostas = new ArquivoResposta();
             ArquivoPergunta arqPerguntas = new ArquivoPergunta();
 
+            // Não há índice de respostas por usuário: percorre o índice pergunta -> resposta
             ArrayList<ParPerguntaResposta> lista = arqRespostas.getIndicePerguntaResposta().read(null);
+            ArrayList<Resposta> minhas = new ArrayList<>();
 
-            if (lista == null || lista.isEmpty()) {
-                System.out.println("\nVocê ainda não respondeu nenhuma pergunta.");
+            for (ParPerguntaResposta par : lista) {
+                Resposta r = arqRespostas.read(par.getIdResposta());
+                if (r != null && r.ativa && r.getIdUsuario() == usuario.getId()) {
+                    minhas.add(r);
+                }
+            }
+
+            if (minhas.isEmpty()) {
+                System.out.println("\nVocê não tem respostas ativas.");
                 return;
             }
 
             int numero = 1;
-            boolean encontrou = false;
+            for (Resposta r : minhas) {
+                Pergunta p = arqPerguntas.read(r.getIdPergunta());
+                System.out.println("\n" + numero + " - Pergunta: " + (p != null ? p.pergunta : "Pergunta removida"));
+                System.out.println("Resposta: " + r.texto);
+                System.out.println("Nota: " + r.nota + " (" + r.avaliacoes + " avaliações)");
+                numero++;
+            }
 
-            for (ParPerguntaResposta par : lista) {
-                Resposta r = arqRespostas.read(par.getIdResposta());
+            System.out.print("\nDigite o número da resposta que deseja arquivar (0 para retornar): ");
+            int escolha = Integer.parseInt(console.nextLine());
 
-                if (r != null && r.ativa && r.getIdUsuario() == usuario.getId()) {
-                    Pergunta p = arqPerguntas.read(r.getIdPergunta());
+            if (escolha == 0) return;
 
-                    System.out
-                            .println("\n" + numero + " - Pergunta: " + (p != null ? p.pergunta : "Pergunta removida"));
-                    System.out.println("Resposta: " + r.texto);
-                    System.out.println("Nota: " + r.nota);
+            if (escolha < 1 || escolha > minhas.size()) {
+                System.out.println("Número inválido.");
+                return;
+            }
 
-                    numero++;
-                    encontrou = true;
+            Resposta selecionada = minhas.get(escolha - 1);
+
+            System.out.println("\nResposta: " + selecionada.texto);
+            System.out.print("Confirma o arquivamento desta resposta? (S/N): ");
+
+            String resposta = console.nextLine().toUpperCase();
+            char confirma = resposta.isEmpty() ? ' ' : resposta.charAt(0);
+
+            if (confirma == 'S') {
+                if (arqRespostas.arquivar(selecionada.getId())) {
+                    System.out.println("\nResposta arquivada com sucesso!");
+                } else {
+                    System.out.println("\nNão foi possível arquivar a resposta.");
                 }
+            } else {
+                System.out.println("\nArquivamento cancelado.");
             }
 
-            if (!encontrou) {
-                System.out.println("\nVocê ainda não respondeu nenhuma pergunta.");
-            }
-
+        } catch (NumberFormatException e) {
+            System.out.println("\nNúmero inválido! Digite apenas números.");
         } catch (Exception e) {
             System.out.println("\nErro ao listar suas respostas!");
             e.printStackTrace();
         }
     }
 
-    private void meusVotos() {
+    private void minhasAvaliacoes() {
         try {
-            System.out.println("\nMeus votos");
-            System.out.println("----------");
+            System.out.println("\nMinhas avaliações");
+            System.out.println("-----------------");
 
             ArquivoVoto arqVotos = new ArquivoVoto();
             ArquivoPergunta arqPerguntas = new ArquivoPergunta();
             ArquivoResposta arqRespostas = new ArquivoResposta();
 
-            ArrayList<ParUsuarioVoto> lista = arqVotos.getIndiceUsuarioVoto().read(null);
+            ArrayList<Voto> votos = arqVotos.getVotosPorUsuario(usuario.getId());
 
-            if (lista == null || lista.isEmpty()) {
-                System.out.println("\nVocê ainda não votou em nada.");
+            if (votos.isEmpty()) {
+                System.out.println("\nVocê ainda não avaliou nenhuma resposta.");
                 return;
             }
 
             int numero = 1;
-            boolean encontrou = false;
+            for (Voto v : votos) {
+                Resposta r = arqRespostas.read(v.idResposta);
+                Pergunta p = (r != null) ? arqPerguntas.read(r.getIdPergunta()) : null;
 
-            for (ParUsuarioVoto par : lista) {
-                Voto v = arqVotos.read(par.getIdVoto());
-
-                if (v != null && v.getIdUsuario() == usuario.getId()) {
-                    if (v.idResposta > 0) {
-                        Resposta r = arqRespostas.read(v.idResposta);
-                        if (r != null) {
-                            System.out.println("\n" + numero + " - Voto em resposta: " + r.texto);
-                            System.out.println("Valor: " + v.valor);
-                            numero++;
-                            encontrou = true;
-                        }
-                    } else if (v.idPergunta > 0) {
-                        Pergunta p = arqPerguntas.read(v.idPergunta);
-                        if (p != null) {
-                            System.out.println("\n" + numero + " - Voto em pergunta: " + p.pergunta);
-                            System.out.println("Valor: " + v.valor);
-                            numero++;
-                            encontrou = true;
-                        }
-                    }
+                System.out.println("\n" + numero + " - Pergunta: " + (p != null ? p.pergunta : "Pergunta removida"));
+                if (r == null) {
+                    System.out.println("Resposta: Resposta removida");
+                } else {
+                    System.out.println("Resposta: " + r.texto + (r.ativa ? "" : " (arquivada)"));
                 }
+                System.out.println("Sua avaliação: " + (v.avaliacao ? "Positiva (+1)" : "Negativa (-1)"));
+                numero++;
             }
 
-            if (!encontrou) {
-                System.out.println("\nVocê ainda não votou em nada.");
-            }
+            System.out.print("\nDigite o número da avaliação que deseja cancelar (0 para retornar): ");
+            int escolha = Integer.parseInt(console.nextLine());
 
-        } catch (Exception e) {
-            System.out.println("\nErro ao listar seus votos!");
-            e.printStackTrace();
-        }
-    }
+            if (escolha == 0) return;
 
-    private void votarPergunta(Pergunta perguntaSelecionada) {
-        try {
-            if (!perguntaSelecionada.ativa) {
-                System.out.println("\nEsta pergunta foi arquivada e não pode receber votos.");
+            if (escolha < 1 || escolha > votos.size()) {
+                System.out.println("Número inválido.");
                 return;
             }
 
-            if (perguntaSelecionada.getIdUsuario() == usuario.getId()) {
-                System.out.println("\nVocê não pode votar na própria pergunta.");
-                return;
-            }
+            Voto selecionado = votos.get(escolha - 1);
 
-            ArquivoVoto arqVotos = new ArquivoVoto();
-            ArrayList<ParUsuarioVoto> votosUsuario = arqVotos.getIndiceUsuarioVoto().read(null);
-            if (votosUsuario != null) {
-                for (ParUsuarioVoto par : votosUsuario) {
-                    Voto v = arqVotos.read(par.getIdVoto());
-                    if (v != null && v.getIdUsuario() == usuario.getId()
-                            && v.getIdPergunta() == perguntaSelecionada.getId() && v.getIdResposta() == -1) {
-                        System.out.println("\nVocê já votou nesta pergunta.");
-                        return;
-                    }
+            System.out.print("Confirma o cancelamento desta avaliação? (S/N): ");
+
+            String resposta = console.nextLine().toUpperCase();
+            char confirma = resposta.isEmpty() ? ' ' : resposta.charAt(0);
+
+            if (confirma == 'S') {
+                // ArquivoVoto.delete também desfaz o efeito do voto na nota da resposta
+                if (arqVotos.delete(selecionado.getId())) {
+                    System.out.println("\nAvaliação cancelada com sucesso!");
+                } else {
+                    System.out.println("\nNão foi possível cancelar a avaliação.");
                 }
+            } else {
+                System.out.println("\nA avaliação foi mantida.");
             }
-
-            System.out.print("\nValor do voto (+1 ou -1): ");
-            String entrada = console.nextLine();
-
-            if (entrada.isEmpty()) {
-                return;
-            }
-
-            short valor = Short.parseShort(entrada);
-
-            if (valor != 1 && valor != -1) {
-                System.out.println("\nValor inválido. Use apenas +1 ou -1.");
-                return;
-            }
-
-            Voto voto = new Voto(usuario.getId(), perguntaSelecionada.getId(), -1, valor);
-            arqVotos.create(voto);
-
-            perguntaSelecionada.nota = (short) (perguntaSelecionada.nota + valor);
-            ArquivoPergunta arqPerguntas = new ArquivoPergunta();
-            arqPerguntas.update(perguntaSelecionada);
-
-            System.out.println("\nVoto registrado com sucesso!");
 
         } catch (NumberFormatException e) {
-            System.out.println("\nNúmero inválido. Digite apenas números.");
+            System.out.println("\nNúmero inválido! Digite apenas números.");
         } catch (Exception e) {
-            System.out.println("\nErro ao votar na pergunta!");
+            System.out.println("\nErro ao listar suas avaliações!");
             e.printStackTrace();
         }
     }
