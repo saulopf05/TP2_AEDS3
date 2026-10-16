@@ -8,23 +8,23 @@ import java.io.IOException;
 
 import aed3.Registro;
 
-public class Voto implements Registro {
+public class Avaliacao implements Registro {
 
-    public int idVoto;
+    public int idAvaliacao;
     public int idUsuario;
     public int idResposta;
     public boolean avaliacao;
 
-    public Voto() {
+    public Avaliacao() {
         this(-1, -1, -1, true);
     }
 
-    public Voto(int idUsuario, int idResposta, boolean avaliacao) {
+    public Avaliacao(int idUsuario, int idResposta, boolean avaliacao) {
         this(-1, idUsuario, idResposta, avaliacao);
     }
 
-    public Voto(int idVoto, int idUsuario, int idResposta, boolean avaliacao) {
-        this.idVoto = idVoto;
+    public Avaliacao(int idAvaliacao, int idUsuario, int idResposta, boolean avaliacao) {
+        this.idAvaliacao = idAvaliacao;
         this.idUsuario = idUsuario;
         this.idResposta = idResposta;
         this.avaliacao = avaliacao;
@@ -32,12 +32,12 @@ public class Voto implements Registro {
 
     @Override
     public void setId(int id) {
-        this.idVoto = id;
+        this.idAvaliacao = id;
     }
 
     @Override
     public int getId() {
-        return this.idVoto;
+        return this.idAvaliacao;
     }
 
     public int getIdUsuario() {
@@ -53,7 +53,7 @@ public class Voto implements Registro {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
 
-        dos.writeInt(this.idVoto);
+        dos.writeInt(this.idAvaliacao);
         dos.writeInt(this.idUsuario);
         dos.writeInt(this.idResposta);
         dos.writeBoolean(this.avaliacao);
@@ -66,7 +66,7 @@ public class Voto implements Registro {
         ByteArrayInputStream bais = new ByteArrayInputStream(b);
         DataInputStream dis = new DataInputStream(bais);
 
-        this.idVoto = dis.readInt();
+        this.idAvaliacao = dis.readInt();
         this.idUsuario = dis.readInt();
         this.idResposta = dis.readInt();
         this.avaliacao = dis.readBoolean();
@@ -74,7 +74,7 @@ public class Voto implements Registro {
 
     @Override
     public String toString() {
-        return "\nVoto: " + (this.avaliacao ? "Positivo" : "Negativo") +
+        return "\nAvaliação: " + (this.avaliacao ? "Positiva" : "Negativa") +
                 "\nResposta: " + this.idResposta +
                 "\nUsuário: " + this.idUsuario;
     }

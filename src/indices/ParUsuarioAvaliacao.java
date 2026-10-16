@@ -6,27 +6,27 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class ParUsuarioVoto implements aed3.InterfaceArvoreBMais<ParUsuarioVoto> {
+public class ParUsuarioAvaliacao implements aed3.InterfaceArvoreBMais<ParUsuarioAvaliacao> {
 
     private int idUsuario;
-    private int idVoto;
+    private int idAvaliacao;
 
-    public ParUsuarioVoto() {
+    public ParUsuarioAvaliacao() {
         this.idUsuario = -1;
-        this.idVoto = -1;
+        this.idAvaliacao = -1;
     }
 
-    public ParUsuarioVoto(int idUsuario, int idVoto) {
+    public ParUsuarioAvaliacao(int idUsuario, int idAvaliacao) {
         this.idUsuario = idUsuario;
-        this.idVoto = idVoto;
+        this.idAvaliacao = idAvaliacao;
     }
 
     public int getIdUsuario() {
         return idUsuario;
     }
 
-    public int getIdVoto() {
-        return idVoto;
+    public int getIdAvaliacao() {
+        return idAvaliacao;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class ParUsuarioVoto implements aed3.InterfaceArvoreBMais<ParUsuarioVoto>
         DataOutputStream dos = new DataOutputStream(baos);
 
         dos.writeInt(idUsuario);
-        dos.writeInt(idVoto);
+        dos.writeInt(idAvaliacao);
 
         return baos.toByteArray();
     }
@@ -51,29 +51,29 @@ public class ParUsuarioVoto implements aed3.InterfaceArvoreBMais<ParUsuarioVoto>
         DataInputStream dis = new DataInputStream(bais);
 
         idUsuario = dis.readInt();
-        idVoto = dis.readInt();
+        idAvaliacao = dis.readInt();
     }
 
     @Override
-    public int compareTo(ParUsuarioVoto outro) {
+    public int compareTo(ParUsuarioAvaliacao outro) {
         if (this.idUsuario != outro.idUsuario) {
             return Integer.compare(this.idUsuario, outro.idUsuario);
         }
-        
-        if (this.idVoto == -1 || outro.idVoto == -1) {
+
+        if (this.idAvaliacao == -1 || outro.idAvaliacao == -1) {
             return 0;
         }
 
-        return Integer.compare(this.idVoto, outro.idVoto);
+        return Integer.compare(this.idAvaliacao, outro.idAvaliacao);
     }
 
     @Override
-    public ParUsuarioVoto clone() {
-        return new ParUsuarioVoto(this.idUsuario, this.idVoto);
+    public ParUsuarioAvaliacao clone() {
+        return new ParUsuarioAvaliacao(this.idUsuario, this.idAvaliacao);
     }
 
     @Override
     public String toString() {
-        return "(" + idUsuario + ";" + idVoto + ")";
+        return "(" + idUsuario + ";" + idAvaliacao + ")";
     }
 }

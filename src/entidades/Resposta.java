@@ -14,7 +14,7 @@ public class Resposta implements Registro {
     public int idPergunta;
     public int idUsuario;
     public long criacao;
-    public String texto;
+    public String resposta;
     public short nota;
     public short avaliacoes;
     public boolean ativa;
@@ -23,16 +23,16 @@ public class Resposta implements Registro {
         this(-1, -1, -1, 0, "", (short) 0, (short) 0, true);
     }
 
-    public Resposta(int idPergunta, int idUsuario, String texto) {
-        this(-1, idPergunta, idUsuario, System.currentTimeMillis(), texto, (short) 0, (short) 0, true);
+    public Resposta(int idPergunta, int idUsuario, String resposta) {
+        this(-1, idPergunta, idUsuario, System.currentTimeMillis(), resposta, (short) 0, (short) 0, true);
     }
 
-    public Resposta(int idResposta, int idPergunta, int idUsuario, long criacao, String texto, short nota, short avaliacoes, boolean ativa) {
+    public Resposta(int idResposta, int idPergunta, int idUsuario, long criacao, String resposta, short nota, short avaliacoes, boolean ativa) {
         this.idResposta = idResposta;
         this.idPergunta = idPergunta;
         this.idUsuario = idUsuario;
         this.criacao = criacao;
-        this.texto = texto;
+        this.resposta = resposta;
         this.nota = nota;
         this.avaliacoes = avaliacoes;
         this.ativa = ativa;
@@ -65,7 +65,7 @@ public class Resposta implements Registro {
         dos.writeInt(this.idPergunta);
         dos.writeInt(this.idUsuario);
         dos.writeLong(this.criacao);
-        dos.writeUTF(this.texto);
+        dos.writeUTF(this.resposta);
         dos.writeShort(this.nota);
         dos.writeShort(this.avaliacoes);
         dos.writeBoolean(this.ativa);
@@ -82,7 +82,7 @@ public class Resposta implements Registro {
         this.idPergunta = dis.readInt();
         this.idUsuario = dis.readInt();
         this.criacao = dis.readLong();
-        this.texto = dis.readUTF();
+        this.resposta = dis.readUTF();
         this.nota = dis.readShort();
         this.avaliacoes = dis.readShort();
         this.ativa = dis.readBoolean();
@@ -90,7 +90,7 @@ public class Resposta implements Registro {
 
     @Override
     public String toString() {
-        return "\nResposta: " + this.texto +
+        return "\nResposta: " + this.resposta +
                 "\nNota: " + this.nota + " (" + this.avaliacoes + " avaliações)" +
                 (this.ativa ? "" : "\nINATIVA");
     }

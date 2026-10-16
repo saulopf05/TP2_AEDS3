@@ -54,6 +54,16 @@ public class ArquivoPergunta extends aed3.Arquivo<Pergunta> {
         return id;
     }
 
+    /** Perguntas de um usuário (ativas e arquivadas), pela Árvore B+ (idUsuario; idPergunta). */
+    public ArrayList<Pergunta> getPerguntasPorUsuario(int idUsuario) throws Exception {
+        ArrayList<Pergunta> perguntas = new ArrayList<>();
+        for (ParUsuarioPergunta par : indiceUsuarioPergunta.read(new ParUsuarioPergunta(idUsuario, -1))) {
+            Pergunta p = read(par.getIdPergunta());
+            if (p != null) perguntas.add(p);
+        }
+        return perguntas;
+    }
+
     /** Retorna uma página de perguntas ativas, cinco por página, mais recentes primeiro. */
     public List<Pergunta> listarRecentes(int pagina, int tamanhoPagina) throws Exception {
         if (pagina < 0 || tamanhoPagina < 1) throw new IllegalArgumentException("Página ou tamanho inválido.");

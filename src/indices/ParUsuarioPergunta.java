@@ -60,6 +60,11 @@ public class ParUsuarioPergunta implements aed3.InterfaceArvoreBMais<ParUsuarioP
             return Integer.compare(this.idUsuario, outro.idUsuario);
         }
 
+        // idPergunta = -1 funciona como curinga: casa com todas as perguntas do usuário
+        if(this.idPergunta == -1 || outro.idPergunta == -1) {
+            return 0;
+        }
+
         return Integer.compare(this.idPergunta, outro.idPergunta);
     }
 

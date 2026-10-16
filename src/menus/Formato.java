@@ -16,11 +16,26 @@ public class Formato {
     private static final DateTimeFormatter DATA_HORA =
         DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+    private static final DateTimeFormatter DATA_HORA_EXTENSO =
+        DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
+
     private Formato() {
     }
 
     public static String dataHora(long milissegundos) {
         return DATA_HORA.format(
+            Instant.ofEpochMilli(milissegundos).atZone(ZoneId.systemDefault())
+        );
+    }
+
+    /** Quantidade de avaliações com o plural certo: "1 avaliação", "3 avaliações". */
+    public static String avaliacoes(int quantidade) {
+        return quantidade + (quantidade == 1 ? " avaliação" : " avaliações");
+    }
+
+    /** Data no formato das telas do enunciado: "15/09/2026 às 17:52". */
+    public static String dataHoraExtenso(long milissegundos) {
+        return DATA_HORA_EXTENSO.format(
             Instant.ofEpochMilli(milissegundos).atZone(ZoneId.systemDefault())
         );
     }
