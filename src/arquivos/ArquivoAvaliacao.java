@@ -61,21 +61,23 @@ public class ArquivoAvaliacao extends Arquivo<Avaliacao> {
 
     @Override
     public boolean delete(int idAvaliacao) throws Exception {
-        Avaliacao a = super.read(idAvaliacao);
+        Avaliacao a = super.read(idAvaliacao); // lê a avaliação a ser excluída
         if (a != null) {
-            Resposta r = arqRespostas.read(a.getIdResposta());
+            Resposta r = arqRespostas.read(a.getIdResposta()); // lê a resposta associada à avaliação
             if (r != null) {
-                r.avaliacoes--;
+                r.avaliacoes--; // decrementa o contador de avaliações da resposta
                 if (a.avaliacao) {
-                    r.nota--;
+                    r.nota--; // se a avaliação era positiva, decrementa a nota da resposta
                 } else {
                     r.nota++;
                 }
                 arqRespostas.update(r);
             }
 
-            indiceUsuarioAvaliacao.delete(new ParUsuarioAvaliacao(a.getIdUsuario(), a.getId()));
-            indiceRespostaAvaliacao.delete(new ParRespostaAvaliacao(a.getIdResposta(), a.getId()));
+            indiceUsuarioAvaliacao.delete(new ParUsuarioAvaliacao(a.getIdUsuario(), a.getId())); // remove o par (idUsuario, idAvaliacao) 
+            // da árvore B+ de índice de usuários para avaliações
+            indiceRespostaAvaliacao.delete(new ParRespostaAvaliacao(a.getIdResposta(), a.getId()));// remove o par (idResposta, idAvaliacao) 
+            // da árvore B+ de índice de respostas para avaliações
             return super.delete(idAvaliacao);
         }
         return false;

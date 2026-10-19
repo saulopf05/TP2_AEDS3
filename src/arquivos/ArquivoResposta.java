@@ -34,10 +34,12 @@ public class ArquivoResposta extends aed3.Arquivo<Resposta> {
 
     @Override
     public int create(Resposta r) throws Exception {
-        int id = super.create(r);
-        r.setId(id);
-        indicePerguntaResposta.create(new ParPerguntaResposta(r.getIdPergunta(), id));
-        indiceUsuarioResposta.create(new ParUsuarioResposta(r.getIdUsuario(), id));
+        int id = super.create(r); // cria a resposta no arquivo de respostas e retorna o ID gerado
+        r.setId(id); // define o ID da resposta recém-criada
+        indicePerguntaResposta.create(new ParPerguntaResposta(r.getIdPergunta(), id)); // cria um par (idPergunta, idResposta) 
+        // na árvore B+ de índice de perguntas para respostas
+        indiceUsuarioResposta.create(new ParUsuarioResposta(r.getIdUsuario(), id));// cria um par (idUsuario, idResposta) na 
+        // árvore B+ de índice de usuários para respostas
         return id;
     }
 

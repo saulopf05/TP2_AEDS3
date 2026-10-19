@@ -611,3 +611,4 @@ Os dados e índices ficam em arquivos na pasta `dados/`. Depois de encerrar e in
 | Respostas arquivadas fora de todas as listagens | Funcionou |
 | Árvores B+ com centenas de inserções e remoções intercaladas (ordem das folhas e buscas) | Funcionou após as correções da seção 8.6 |
 | Persistência após reiniciar a aplicação | Funcionou |
+

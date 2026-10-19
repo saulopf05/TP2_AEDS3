@@ -66,16 +66,25 @@ public class ArquivoPergunta extends aed3.Arquivo<Pergunta> {
 
     /** Retorna uma página de perguntas ativas, cinco por página, mais recentes primeiro. */
     public List<Pergunta> listarRecentes(int pagina, int tamanhoPagina) throws Exception {
+        // Impede páginas negativas e tamanhos de página inválidos.
         if (pagina < 0 || tamanhoPagina < 1) throw new IllegalArgumentException("Página ou tamanho inválido.");
+
+        // Lê todas as chaves do índice cronológico e as ordena da mais recente para a mais antiga.
         ArrayList<ParDataPergunta> chaves = indiceDataPergunta.read(null);
         Collections.sort(chaves, (a, b) -> b.compareTo(a));
+
+        // Busca os registros correspondentes e mantém somente as perguntas ainda ativas.
         ArrayList<Pergunta> ativas = new ArrayList<>();
         for (ParDataPergunta chave : chaves) {
             Pergunta p = read(chave.getIdPergunta());
             if (p != null && p.ativa) ativas.add(p);
         }
+
+        // Calcula a posição inicial da página e retorna uma lista vazia se não houver resultados.
         int inicio = pagina * tamanhoPagina;
         if (inicio >= ativas.size()) return new ArrayList<>();
+
+        // Define o limite final sem ultrapassar a quantidade de perguntas disponíveis.
         return new ArrayList<>(ativas.subList(inicio, Math.min(inicio + tamanhoPagina, ativas.size())));
     }
 }
